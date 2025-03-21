@@ -2,6 +2,7 @@ const express = require("express")
 const mongoose = require("mongoose")
 const cors = require("cors")
 const cookieParser = require("cookie-parser")
+const path = require("path");
 const { sellerProtected, adminProtected, userProtected } = require("./middlewares/auth.middleware")
 require("dotenv").config()
 
@@ -9,20 +10,22 @@ require("dotenv").config()
 const app = express()
 
 app.use(express.json())
+app.use(express.static("dist"));
 app.use(cookieParser())
 app.use(cors({
-    origin: "http://localhost:5173",
+    origin: "https://ecom-hpeu.onrender.com",
     credentials: true
 }))
-app.use("/api/auth", require("./routes/auth.routes"))
+ app.use("/api/auth", require("./routes/auth.routes"))
 app.use("/api/seller", sellerProtected , require("./routes/seller.routes"))
 app.use("/api/admin", adminProtected , require("./routes/admin.routes"))
 app.use("/api/public",  require("./routes/public.routes"))
 app.use("/api/user", userProtected,  require("./routes/user.routes"))
 
 app.use("*", ( req, res) => {
-    // console.log(err)
-    res.status(404).json({ message: "resource not found" })
+    console.log(err)
+    res.sendFile(path.join(__dirname, "dist", "index.html"))
+    // res.status(404).json({ message: "resource not found" })
 
 })
 app.use((err, req, res, next) => {
